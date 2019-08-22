@@ -1,23 +1,19 @@
 const { Builder, By, Key, until } = require("selenium-webdriver");
-var Assert = require("assert");
+const chrome = require('selenium-webdriver/chrome');
+
 
 (async function example() {
   var loop = true;
-  var retorno = "try again";
   var contador = 0;
 
   while (loop) {
     contador++;
     await verificar(contador);
-    if (retorno != "try again") {
-      loop = false;
-      alerta();
-    }
   }
 })();
 
-function alerta() {
-  console.log("ALERTA");
+function alerta(cont) {
+  console.log("ALERTA - vai comentar! "+cont);
 }
 
 function wait(ms) {
@@ -29,7 +25,10 @@ function wait(ms) {
 }
 
 async function verificar(contador) {
-  let driver = await new Builder().forBrowser("firefox").build();
+  let driver = await new Builder()
+    .forBrowser("chrome")
+    .setChromeOptions(new chrome.Options().headless())
+    .build();
   try {
     // await driver.get('http://www.google.com/ncr');
     // await driver.findElement(By.name('q')).sendKeys('webdriver', Key.RETURN);
@@ -39,20 +38,25 @@ async function verificar(contador) {
     var comparar = 'https://www.instagram.com/p/B1blb3yn25H/';
     var xpath = '//*[@id="react-root"]/section/main/div/div[3]/article/div[1]/div/div[1]/div[1]/a';
 
-    // para testtes
+    // para testes
     // perfil = "https://www.instagram.com/_gstvinf/";
     // comparar = "https://www.instagram.com/p/B1dsnwQlhRs/";
     // xpath = '//*[@id="react-root"]/section/main/div/div[2]/article/div/div/div[1]/div[1]/a';
 
     await driver.get(perfil);
 
-    wait(500);
-
     var link = await driver.findElement(By.xpath(xpath)).getAttribute("href");
 
-    await Assert.equal(link, comparar, "COMENTAAAAA!");
+    if (link != comparar) {
+      var cont = 0;
+      while (true) {
+        cont++;
+        alerta(cont);
+        wait(1000);
+      }
+    }
   } finally {
-    console.log("try again " + contador);
+    console.log("trying again " + contador);
     await driver.quit();
   }
 }
